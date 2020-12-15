@@ -24,7 +24,6 @@ public class objectsContainer : MonoBehaviour
             {
                 Instantiate(myFood).transform.SetParent(myPlayer.transform);
             }
-                // Instantiate(myFood).transform.SetParent(myPlayer.transform);
         }
     }
 

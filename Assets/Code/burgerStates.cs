@@ -7,7 +7,6 @@ public class burgerStates : MonoBehaviour
     public float m_BurgerTime = 0;
     Animator m_animator;
     Color m_Burned, m_Medium, m_Ready, m_Rare;
-    public Color[] myColors;
     void Start()
     {
         m_animator = GetComponent<Animator>();

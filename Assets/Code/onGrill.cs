@@ -37,29 +37,26 @@ public class onGrill : MonoBehaviour
                 return;
             }
                
-            for (int i = 0; i < myPlayer.transform.childCount; i++)
-            {
-                Transform child = myPlayer.transform.GetChild(i);
-                if (child.name == "Burger(Clone)") // grill accepts only Burgers!!!
+            //for (int i = 0; i < myPlayer.transform.childCount; i++)
+            //{
+            //    Transform child = myPlayer.transform.GetChild(i);
+
+                Transform myChild = myPlayer.transform.Find("Burger(Clone)").transform;
+                if (myChild != null) // grill accepts only Burgers!!!
                 {
-                    
-                    child.transform.SetParent(this.transform); //parent is grill
-                    this.myFood = child;
+
+                    myChild.transform.SetParent(this.transform); //parent is grill
+                    this.myFood = myChild;
 
                     m_onGrill = true;
 
                     myFood.transform.localPosition = new Vector3(0f, 0.44f, 0.9f);
                     m_timeBetweenTrades = Time.realtimeSinceStartup;
-                    break;
+                   // break;
                 }
 
-            }
+           // }
         }
-    }
-    void handleBurger()
-    {
-
-
     }
 
     void OnCollisionEnter(Collision other)

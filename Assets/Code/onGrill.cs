@@ -9,53 +9,56 @@ public class onGrill : MonoBehaviour
     public joyButton m_getInfo;
     public Transform myFood;
     public bool m_onGrill = false;
-    public float m_timeBetweenTrades;
 
-    Animator burgerAnimator;
+    public bool youCanClick = true;
+    Animator TimeUpAnimator;
+    burgerStates myBurger;
+
     void Start()
     {
-
-        
+        TimeUpAnimator = this.transform.GetChild(2).GetComponent<Animator>();
     }
-   
+
     // Update is called once per frame
     void Update()
     {
- 
+        if(myFood == null)
+            TimeUpAnimator.SetBool("TimeIsUp", false);
+
+        if (!youCanClick) 
+        {
+            if(m_getInfo.ReturnIfPressed())
+                return;
+            youCanClick = true;
+        }
         if (isCollideWithPlayer && m_getInfo.ReturnIfPressed()) // if theres a collision and the pickup button is pressed
         {
+            youCanClick = false;
             if (m_onGrill)
             {
-                if (myPlayer.transform.childCount <= 2 && Time.realtimeSinceStartup >= m_timeBetweenTrades + 1)
+                if (myPlayer.transform.childCount <= 2)
                 {
                     //יש מירוץ בין לקחת את האובייקט מהקופסא ולהחזיר אותו לקופסא
                     //רק בכאלו שהם בלי אוכל, לא בקופסאות שמביאות אוכל
                     //לחשוב על משהו יפה
                     myFood.transform.SetParent(myPlayer.transform);
                     this.myFood = null;
+                    m_onGrill = false;
                 }
                 return;
             }
-               
-            //for (int i = 0; i < myPlayer.transform.childCount; i++)
-            //{
-            //    Transform child = myPlayer.transform.GetChild(i);
 
-                Transform myChild = myPlayer.transform.Find("Burger(Clone)").transform;
-                if (myChild != null) // grill accepts only Burgers!!!
-                {
+            Transform myChild = myPlayer.transform.Find("Burger(Clone)").transform;
+            if (myChild != null) // grill accepts only Burgers!!!
+            {
+                myChild.transform.SetParent(this.transform); //parent is grill
+                this.myFood = myChild;
 
-                    myChild.transform.SetParent(this.transform); //parent is grill
-                    this.myFood = myChild;
-
-                    m_onGrill = true;
-
-                    myFood.transform.localPosition = new Vector3(0f, 0.44f, 0.9f);
-                    m_timeBetweenTrades = Time.realtimeSinceStartup;
-                   // break;
-                }
-
-           // }
+                m_onGrill = true;
+                myFood.transform.localPosition = new Vector3(0f, 0.44f, 0.9f);
+                myBurger = this.myFood.GetComponent<burgerStates>();
+                TimeUpAnimator.SetBool("TimeIsUp", true);
+            }
         }
     }
 
@@ -66,6 +69,7 @@ public class onGrill : MonoBehaviour
             isCollideWithPlayer = true;
         }
     }
+
     void OnCollisionExit(Collision other)
     {
         if (other.gameObject.CompareTag("Player"))

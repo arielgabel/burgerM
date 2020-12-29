@@ -10,6 +10,7 @@ public class objectsContainer : MonoBehaviour
     public joyButton m_getInfo;
     Animator m_Animator;
     // Start is called before the first frame update
+    public bool youCanClick = true;
     void Start()
     {
         m_Animator = GetComponent<Animator>();
@@ -18,11 +19,19 @@ public class objectsContainer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!youCanClick)
+        {
+            if (m_getInfo.ReturnIfPressed())
+                return;
+            youCanClick = true;
+        }
+
         if (m_isCollideWithPlayer && m_getInfo.ReturnIfPressed()) // if theres a collision and the pickup button is pressed
         {
-             if (myPlayer.transform.childCount <= 2) // doesn't hold a thing
+            youCanClick = false;
+            if (myPlayer.transform.childCount <= 2) // doesn't hold a thing
             {
-                Instantiate(myFood).transform.SetParent(myPlayer.transform);
+               Instantiate(myFood).transform.SetParent(myPlayer.transform);
             }
         }
     }

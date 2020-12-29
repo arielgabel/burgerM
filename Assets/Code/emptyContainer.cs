@@ -10,7 +10,8 @@ public class emptyContainer : MonoBehaviour
     public GameObject myPlayer;
     public joyButton m_getInfo; // need to check how
     Color m_Color;
-    public float m_timeBetweenTrades;
+    // public float m_timeBetweenTrades;
+    public bool youCanClick = true;
 
     void Start()
     {
@@ -21,53 +22,57 @@ public class emptyContainer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!youCanClick)
+        {
+            if (m_getInfo.ReturnIfPressed())
+                return;
+            youCanClick = true;
+        }
+
         if (isCollideWithPlayer && m_getInfo.ReturnIfPressed()) // if theres a collision and the pickup button is pressed
         {
-            if(m_takeFrom)
+            youCanClick = false;
+            if (m_takeFrom)
             {
-                if (myPlayer.transform.childCount <= 2 && Time.realtimeSinceStartup >= m_timeBetweenTrades + 1)
+                // && Time.realtimeSinceStartup >= m_timeBetweenTrades + 1
+                if (myPlayer.transform.childCount <= 2)
                 {
                     Debug.Log("takeee");
-                        //יש מירוץ בין לקחת את האובייקט מהקופסא ולהחזיר אותו לקופסא
-                        //רק בכאלו שהם בלי אוכל, לא בקופסאות שמביאות אוכל
-                        //לחשוב על משהו יפה
-                       myFood.transform.SetParent(myPlayer.transform);
-                       m_takeFrom = false;
-                       this.myFood = null;
+                    //יש מירוץ בין לקחת את האובייקט מהקופסא ולהחזיר אותו לקופסא
+                    //רק בכאלו שהם בלי אוכל, לא בקופסאות שמביאות אוכל
+                    //לחשוב על משהו יפה
+                    myFood.transform.SetParent(myPlayer.transform);
+                    m_takeFrom = false;
+                    this.myFood = null;
                 }
 
                 //צריכים לחשב יותר טוב איפה שמים כל אובייקט מבחינת המרכיבים בהמבורגר
-                else if(myPlayer.transform.childCount  == 3 && myFood.tag == "Plate") // object on plate
+                else if (myPlayer.transform.childCount == 3 && myFood.tag == "Plate") // object on plate
                 {
                     Transform child = myPlayer.transform.GetChild(2);
-                    if(child.tag == "Food") // כי אני לא רוצה לשים צלחת על צלחת, אין היגיון
+                    if (child.tag == "Food") // כי אני לא רוצה לשים צלחת על צלחת, אין היגיון
                     {
-                        for(int i = 0; i <myFood.childCount; i++)
+                        Transform myBread = myFood.transform.Find("Bread(Clone)");
+                        //אם יש לחמניה בצלחת, והאובייקט שהשחקן רוצה להניח הוא לא לחמניה(אין היגיון בלשים לחמניה על לחמניה)
+                        if (myBread != null && child.name != "Bread(Clone)")
                         {
-                            Transform myBread = myFood.transform.GetChild(i);
+                            Transform myTopBun = myBread.transform.Find("TopBun");
+                            Transform myBottomBun = myBread.transform.Find("BottomBun");
 
-                            //אם יש לחמניה בצלחת, והאובייקט שהשחקן רוצה להניח הוא לא לחמניה(אין היגיון בלשים לחמניה על לחמניה)
-                            if(myBread.name == "Bread(Clone)" && child.name != "Bread(Clone)") 
-                            {
-                                for (int j = 0; j < myBread.childCount; j++)
-                                {
-                                    Transform myTopBun = myBread.transform.GetChild(j);
-                                    if (myTopBun.tag == "TopBun") // אני רוצה להעלות את הלחמניה העליונה ולשים את האובייקט באמצע
-                                    {
-                                        myTopBun.transform.localPosition = new Vector3(
-                                            myTopBun.transform.localPosition.x,
-                                            myTopBun.transform.localPosition.y + 0.2f, // move up a little
-                                            myTopBun.transform.localPosition.z);
-                                    }
-                                }
-                            }
+                     //       if (myTopBun.tag == "TopBun") // אני רוצה להעלות את הלחמניה העליונה ולשים את האובייקט באמצע
+                     //       {
+                                myTopBun.transform.localPosition = new Vector3(
+                                    myTopBun.transform.localPosition.x,
+                                    myTopBun.transform.localPosition.y + 0.2f, // move up a little
+                                    myTopBun.transform.localPosition.z);
+                      //      }
                         }
                         child.transform.SetParent(myFood.transform);
-                        if(child.name == "Burger(Clone)")
+                        if (child.name == "Burger(Clone)")
                             child.transform.localPosition = new Vector3(0f, 0.161f, 0f);
                         else // if it's a plate(need to think about something better ofcourse
                             child.transform.localPosition = new Vector3(0f, 0f, 0f);
-                        m_timeBetweenTrades = Time.realtimeSinceStartup;
+                     //   m_timeBetweenTrades = Time.realtimeSinceStartup;
                     }
                 }
             }
@@ -81,18 +86,18 @@ public class emptyContainer : MonoBehaviour
                         child.transform.SetParent(this.transform);
                         this.myFood = child;
                         // myFood.transform.localPosition = Vector3.zero;
-                        if(child.tag == "Food")
-                           myFood.transform.localPosition = new Vector3(0f, 0f, 1.1f);
+                        if (child.tag == "Food")
+                            myFood.transform.localPosition = new Vector3(0f, 0f, 1.1f);
                         else // זו צלחת
                             myFood.transform.localPosition = new Vector3(0f, 0f, 1.2f);
                         m_takeFrom = true;
 
-                        m_timeBetweenTrades = Time.realtimeSinceStartup; // object moved from player to container
+                     //   m_timeBetweenTrades = Time.realtimeSinceStartup; // object moved from player to container
                         break;
                     }
 
                 }
-                
+
             }
         }
         else
@@ -102,7 +107,7 @@ public class emptyContainer : MonoBehaviour
         }
     }
 
-    
+
     void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Player"))

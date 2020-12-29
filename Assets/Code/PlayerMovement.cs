@@ -47,9 +47,19 @@ public class PlayerMovement : MonoBehaviour
                 m_Animator.SetBool("IsHolding", true);
                 Vector3 playerLoc = this.transform.localPosition;
 
+               
+
                 if (m_Animator.GetCurrentAnimatorStateInfo(0).IsName("standingWith"))
-                    child.localPosition = new Vector3(playerLoc.x + 10, playerLoc.y + 45, playerLoc.z + 30);
+                {
+                    if(child.tag == "Food")
+                        child.localPosition = new Vector3(playerLoc.x + 10, playerLoc.y + 45, playerLoc.z + 30);
+                    else
+                        child.localPosition = new Vector3(playerLoc.x + 20, playerLoc.y + 60, playerLoc.z + 40);
+
+                }
+
                 break;
+                //10, 45, 30
             }
             m_Animator.SetBool("IsHolding", false); // if never break, then 
         }

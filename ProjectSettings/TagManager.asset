@@ -8,6 +8,7 @@ TagManager:
   - Plate
   - TopBun
   - Bread
+  - Sink
   layers:
   - Default
   - TransparentFX

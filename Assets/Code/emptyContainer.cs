@@ -10,7 +10,7 @@ public class emptyContainer : MonoBehaviour
     public GameObject myPlayer;
     public joyButton m_getInfo; // need to check how
     Color m_Color;
-    // public float m_timeBetweenTrades;
+
     public bool youCanClick = true;
 
     void Start()
@@ -34,13 +34,8 @@ public class emptyContainer : MonoBehaviour
             youCanClick = false;
             if (m_takeFrom)
             {
-                // && Time.realtimeSinceStartup >= m_timeBetweenTrades + 1
                 if (myPlayer.transform.childCount <= 2)
                 {
-                    Debug.Log("takeee");
-                    //יש מירוץ בין לקחת את האובייקט מהקופסא ולהחזיר אותו לקופסא
-                    //רק בכאלו שהם בלי אוכל, לא בקופסאות שמביאות אוכל
-                    //לחשוב על משהו יפה
                     myFood.transform.SetParent(myPlayer.transform);
                     m_takeFrom = false;
                     this.myFood = null;
@@ -53,23 +48,32 @@ public class emptyContainer : MonoBehaviour
                     if (child.tag == "Food") // כי אני לא רוצה לשים צלחת על צלחת, אין היגיון
                     {
                         Transform myBread = myFood.transform.Find("Bread(Clone)");
+                        Transform myTopBun = null, myBottomBun = null;
                         //אם יש לחמניה בצלחת, והאובייקט שהשחקן רוצה להניח הוא לא לחמניה(אין היגיון בלשים לחמניה על לחמניה)
                         if (myBread != null && child.name != "Bread(Clone)")
                         {
-                            Transform myTopBun = myBread.transform.Find("TopBun");
-                            Transform myBottomBun = myBread.transform.Find("BottomBun");
+                            myTopBun = myBread.transform.Find("TopBun");
+                            myBottomBun = myBread.transform.Find("BottomBun");
 
-                     //       if (myTopBun.tag == "TopBun") // אני רוצה להעלות את הלחמניה העליונה ולשים את האובייקט באמצע
-                     //       {
-                                myTopBun.transform.localPosition = new Vector3(
+                            myTopBun.transform.localPosition = new Vector3(
                                     myTopBun.transform.localPosition.x,
                                     myTopBun.transform.localPosition.y + 0.2f, // move up a little
                                     myTopBun.transform.localPosition.z);
-                      //      }
                         }
                         child.transform.SetParent(myFood.transform);
                         if (child.name == "Burger(Clone)")
-                            child.transform.localPosition = new Vector3(0f, 0.161f, 0f);
+                        {
+                            if(myTopBun != null)
+                            {
+                                child.transform.localPosition = new Vector3(
+                                    0f,
+                                    myTopBun.transform.localPosition.y -
+                                    myBottomBun.transform.localPosition.y - 0.6f, // move down a little
+                                    0f);
+                            }    
+                            else
+                                child.transform.localPosition = new Vector3(0f, 0.161f, 0f);
+                        }
                         else // if it's a plate(need to think about something better ofcourse
                             child.transform.localPosition = new Vector3(0f, 0f, 0f);
                      //   m_timeBetweenTrades = Time.realtimeSinceStartup;
@@ -83,6 +87,8 @@ public class emptyContainer : MonoBehaviour
                     Transform child = myPlayer.transform.GetChild(i);
                     if (child.tag == "Food" || child.tag == "Plate") // if theres a Food/plate child
                     {
+                        if(child.tag == "Plate")
+                            FindObjectOfType<AudioManager>().Play("PlacePlate");
                         child.transform.SetParent(this.transform);
                         this.myFood = child;
                         // myFood.transform.localPosition = Vector3.zero;

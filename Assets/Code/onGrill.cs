@@ -23,7 +23,23 @@ public class onGrill : MonoBehaviour
     void Update()
     {
         if(myFood == null)
+        {
             TimeUpAnimator.SetBool("TimeIsUp", false);
+        }
+        else
+        {
+            if (!FindObjectOfType<AudioManager>().IsPlaying("BurgerOnGrill"))
+            {
+                Debug.Log("complete firsti audio");
+                if (!FindObjectOfType<AudioManager>().IsPlaying("OnGrill"))
+                {
+                    //FindObjectOfType<AudioManager>().PlayS("OnGrill");
+                    FindObjectOfType<AudioManager>().Play("OnGrill");
+
+                }
+                    
+            } 
+        }
 
         if (!youCanClick) 
         {
@@ -42,6 +58,7 @@ public class onGrill : MonoBehaviour
                     //רק בכאלו שהם בלי אוכל, לא בקופסאות שמביאות אוכל
                     //לחשוב על משהו יפה
                     myFood.transform.SetParent(myPlayer.transform);
+                    FindObjectOfType<AudioManager>().Stop("OnGrill");
                     this.myFood = null;
                     m_onGrill = false;
                 }
@@ -51,6 +68,8 @@ public class onGrill : MonoBehaviour
             Transform myChild = myPlayer.transform.Find("Burger(Clone)").transform;
             if (myChild != null) // grill accepts only Burgers!!!
             {
+                FindObjectOfType<AudioManager>().Play("BurgerOnGrill");
+
                 myChild.transform.SetParent(this.transform); //parent is grill
                 this.myFood = myChild;
 

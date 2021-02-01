@@ -26,6 +26,7 @@ public class throwTrash : MonoBehaviour
             youCanClick = false;
             if(myPlayer.transform.childCount > 2) // 
             {
+                FindObjectOfType<AudioManager>().Play("ThrowTrash");
                 Transform myChild = myPlayer.transform.GetChild(2);
                 if (myChild.tag != "Plate")
                     Destroy(myChild.gameObject);

@@ -14,6 +14,7 @@ public class objectsContainer : MonoBehaviour
     void Start()
     {
         m_Animator = GetComponent<Animator>();
+
     }
 
     // Update is called once per frame
@@ -30,9 +31,7 @@ public class objectsContainer : MonoBehaviour
         {
             youCanClick = false;
             if (myPlayer.transform.childCount <= 2) // doesn't hold a thing
-            {
-               Instantiate(myFood).transform.SetParent(myPlayer.transform);
-            }
+                Instantiate(myFood).transform.SetParent(myPlayer.transform);
         }
     }
 
@@ -42,7 +41,9 @@ public class objectsContainer : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             m_isCollideWithPlayer = true;
-            m_Animator.SetBool("IsCollideWithPlayer", true);
+            if(m_Animator != null)
+                m_Animator.SetBool("IsCollideWithPlayer", true);
+            FindObjectOfType<AudioManager>().Play("OpeningBox");
         }
     }
     void OnCollisionExit(Collision other)
@@ -50,7 +51,8 @@ public class objectsContainer : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             m_isCollideWithPlayer = false;
-            m_Animator.SetBool("IsCollideWithPlayer", false);
+            if(m_Animator != null)
+                m_Animator.SetBool("IsCollideWithPlayer", false);
         }
     }
 }

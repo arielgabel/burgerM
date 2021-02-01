@@ -7,11 +7,12 @@ public class OrderHandler : MonoBehaviour
 {
     bool m_State = false;
     float m_timeOfActive = 0;
+    public float orderTime = 0;
     public void setIngradients()
     {
+        FindObjectOfType<AudioManager>().Play("IconPress");
         m_State = !m_State;
         this.transform.GetChild(0).gameObject.SetActive(m_State);
-        Debug.Log(m_State);
         if (m_State)
             m_timeOfActive = Time.realtimeSinceStartup;
     }

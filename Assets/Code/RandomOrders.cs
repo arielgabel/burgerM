@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using TMPro;
 using UnityEngine;
 
 public class RandomOrders : MonoBehaviour
@@ -18,9 +19,16 @@ public class RandomOrders : MonoBehaviour
     public List<int> m_MyOrdersLocation = new List<int>();
     public List<float> m_MyOrdersTime = new List<float>();
     int XPos = 20, YPos = -20;
+
+
+    public CoinCollection m_CoinCollection;
+    private float outOfTime = 0;
+
+
     
     void Start()
     {
+
         m_RecievedDish = GetComponent<checkerScript>();
         CreateNewOrder();
         CreateNewOrder();
@@ -32,7 +40,7 @@ public class RandomOrders : MonoBehaviour
         randomInt = Random.Range(0, Orders.Length);
 
         myOrders.Add(Instantiate(Orders[randomInt]) as GameObject);
-        m_MyOrdersTime.Add(Time.deltaTime);
+        m_MyOrdersTime.Add(Time.realtimeSinceStartup);
         m_CurrentOrder++;
         m_RectTransform = myOrders[m_CurrentOrder].GetComponent<RectTransform>(); // for image
         myOrders[m_CurrentOrder].transform.SetParent(myCanvas.transform);
@@ -67,19 +75,39 @@ public class RandomOrders : MonoBehaviour
         else
             checkForPressedOrders();
 
-        for(int i = 0; i <m_MyOrdersTime.Count; i++)
+        outOfTime = 0;
+        for (int i = 0; i <m_MyOrdersTime.Count; i++)
         {
-            if (Time.realtimeSinceStartup - m_MyOrdersTime[i] > 30)
+            if (Time.realtimeSinceStartup - m_MyOrdersTime[i] > myOrders[i].GetComponent<OrderHandler>().orderTime)
             {
+                outOfTime++;
+                if (!FindObjectOfType<AudioManager>().IsPlaying("OrderTimeOut"))
+                    FindObjectOfType<AudioManager>().Play("OrderTimeOut");
+
                 Animator orderAnimator;
                 orderAnimator = myOrders[i].transform.GetChild(1).GetComponent<Animator>();
                 orderAnimator.SetBool("Time", true);
             }
         }
-        
+        if(outOfTime == 0)
+            FindObjectOfType<AudioManager>().Stop("OrderTimeOut");
 
-       // if (myOrders.Count < 2)
-       //      CreateNewOrder();
+        checkForOrdersToCreate();
+    }
+
+    void checkForOrdersToCreate()
+    {
+        if (myOrders.Count == 0)
+            CreateNewOrder();
+
+        else if (myOrders.Count < 3)
+        {
+            randomInt = Random.Range(0, 10000);
+            if (randomInt % 9999 == 0)
+            {
+                CreateNewOrder();
+            }
+        }
     }
 
     void checkForPressedOrders()
@@ -138,12 +166,15 @@ public class RandomOrders : MonoBehaviour
     bool findAMatch(Transform order)
     {
         Transform dishObjects = m_RecievedDish.myFood.transform; //the dish that is on checker
+        if (dishObjects.childCount != order.childCount)
+            return false;
         for (int OrderIngradient = 0; OrderIngradient < order.childCount; OrderIngradient++)
         {
             string dishName = order.GetChild(OrderIngradient).name; // the name in variable
 
             if (dishObjects.transform.Find(dishName + "(Clone)") == null) //null so doesn't exists
                 return false;
+            
         }
         return true;
     }
@@ -157,11 +188,18 @@ public class RandomOrders : MonoBehaviour
                 if (findAMatch(myOrders[i].transform.GetChild(0)))
                 {
                     m_RecievedDish.setGreenColor();
+                    FindObjectOfType<AudioManager>().Play("CorrectOrder");
+
+                    m_CoinCollection.StartCoinMove(m_RecievedDish.myFood.transform.position, 5);
                     DestroyDish(true, i);
                     return;
                 }
                 else
+                {
+                    FindObjectOfType<AudioManager>().Play("WrongOrder");
                     m_RecievedDish.setRedColor();
+                }
+                   
 
             }
         }
@@ -176,22 +214,20 @@ public class RandomOrders : MonoBehaviour
 
 
         if(WithOrder)
-        { // it's not m_currectOrder - its the order that i deleted!!!
+        { 
             Destroy(myOrders[deleteOrder].gameObject, 0.3f);
             myOrders.Remove(myOrders[deleteOrder]); // remove gameobject
+            moveBackOtherOrders(deleteOrder);
             m_MyOrdersLocation.Remove(m_MyOrdersLocation[deleteOrder]);
             m_MyOrdersTime.Remove(m_MyOrdersTime[deleteOrder]);
             m_CurrentOrder--;
         }
+    }
 
-        /*
-        if (m_CurrentOrder >= 0 && WithOrder)
-        { // it's not m_currectOrder - its the order that i deleted!!!
-            Destroy(myOrders[m_CurrentOrder].gameObject, 0.3f);
-            myOrders.Remove(myOrders[m_CurrentOrder]); // remove gameobject
-            m_MyOrdersLocation.Remove(m_MyOrdersLocation[m_CurrentOrder]);
-            m_MyOrdersTime.Remove(m_MyOrdersTime[m_CurrentOrder]);
-            m_CurrentOrder--;
-        }*/
+    void moveBackOtherOrders(int endHere)
+    {
+        for (int i = m_MyOrdersLocation.Count - 1; i > endHere; i--)
+            m_MyOrdersLocation[i] = m_MyOrdersLocation[i - 1];
+        
     }
 }

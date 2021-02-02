@@ -7,7 +7,7 @@ public class DirtyPlate : MonoBehaviour
 
     public List<GameObject> m_DirtyPlates = new List<GameObject>();
     public PlateContainer m_CleanPlates;
-    private int numOfPlatesInGame = 0;
+   // private int numOfPlatesInGame = 0;
     private bool m_ActiveState = false;
     // Start is called before the first frame update
     void Awake()

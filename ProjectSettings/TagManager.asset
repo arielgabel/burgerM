@@ -9,6 +9,7 @@ TagManager:
   - TopBun
   - Bread
   - Sink
+  - Event
   layers:
   - Default
   - TransparentFX
